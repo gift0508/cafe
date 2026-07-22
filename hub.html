@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>하루 일정 — 매일 이 순서로</title>
+<style>
+  :root{
+    --ink:#16203A; --muted:#6B7488; --line:#E3E7EF; --paper:#F4F6FA; --card:#fff;
+    --accent:#3B5BDB; --accent-soft:#E8EDFB;
+    --c1:#5b8def; --c2:#4a63e0; --c3:#5847d4; --c4:#7a3fc9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","맑은 고딕",sans-serif;
+    background:#eef1f8; color:var(--ink); line-height:1.6;
+    -webkit-font-smoothing:antialiased; padding:34px 16px;
+  }
+  .wrap{max-width:960px;margin:0 auto}
+
+  .head{text-align:center;margin-bottom:26px}
+  .head .kicker{
+    display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:1.5px;color:#fff;
+    background:linear-gradient(100deg,#1a2350,#3a4fd0);padding:6px 18px;border-radius:30px;margin-bottom:14px;
+  }
+  .head h1{font-size:27px;font-weight:800;letter-spacing:-0.6px;line-height:1.35}
+  .head h1 b{color:var(--accent)}
+  .head p{margin-top:10px;font-size:15px;color:var(--muted)}
+
+  /* 4단계 그리드 */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative}
+  .step{
+    border-radius:16px;padding:24px 18px 22px;color:#fff;text-decoration:none;display:block;
+    position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;
+    box-shadow:0 6px 18px rgba(30,40,90,.12);
+  }
+  .step:hover{transform:translateY(-6px);box-shadow:0 16px 34px rgba(30,40,90,.22)}
+  .step.c1{background:linear-gradient(160deg,#5b8def,#4a76e0)}
+  .step.c2{background:linear-gradient(160deg,#4a63e0,#3a4fd0)}
+  .step.c3{background:linear-gradient(160deg,#5847d4,#4736c0)}
+  .step.c4{background:linear-gradient(160deg,#7a3fc9,#5e2fae)}
+
+  .step .roman{
+    font-size:15px;font-weight:900;letter-spacing:1px;opacity:.85;margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .step .roman .badge{
+    width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .step .daily{
+    display:inline-block;font-size:10.5px;font-weight:800;background:#ffe27a;color:#5a4a00;
+    padding:2px 9px;border-radius:20px;margin-left:auto;
+  }
+  .step .st-name{font-size:19px;font-weight:800;letter-spacing:-0.4px;margin-bottom:8px}
+  .step .st-desc{font-size:13px;line-height:1.55;opacity:.95;min-height:56px;font-weight:500}
+  .step .st-go{
+    margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;
+    background:rgba(255,255,255,.95);color:#2a3160;padding:8px 16px;border-radius:30px;
+  }
+  .step .st-go .arrow{transition:transform .18s ease}
+  .step:hover .st-go .arrow{transform:translateX(4px)}
+
+  .step .wm{
+    position:absolute;right:-6px;bottom:-18px;font-size:88px;font-weight:900;
+    opacity:.1;line-height:1;font-style:italic;
+  }
+
+  /* 연결 화살표 (데스크탑) */
+  .connectors{display:none}
+
+  .foot{
+    margin-top:26px;font-size:13.5px;color:var(--muted);font-weight:600;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 22px;line-height:1.7;
+  }
+  .foot b{color:var(--accent)}
+  .foot-line{margin:4px 0;text-align:left}
+  .foot .daily-mark{display:inline-block;font-size:11px;font-weight:800;background:#ffe27a;color:#5a4a00;padding:1px 8px;border-radius:20px}
+
+  @media (max-width:820px){
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .head h1{font-size:22px}
+  }
+  @media (max-width:440px){
+    .steps{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <span class="kicker">STUDY WITH 시대에듀 · EVERYDAY ROUTINE</span>
+    <h1>매일 이 순서를 지키면 <b>합격</b>이 따라옵니다</h1>
+    <p>아래 단계가 하루의 지켜야 할 루틴입니다. 순서대로 하시고, 남은 시간은 자율학습하세요.</p>
+  </div>
+
+  <div class="steps">
+
+    <a class="step c1" target="_blank" href="https://gift0508.github.io/cafe/check.html">
+      <div class="wm">Ⅰ</div>
+      <div class="roman"><span class="badge">Ⅰ</span></div>
+      <div class="st-name">자가진단</div>
+      <div class="st-desc">지금 내가 <b>어느 단계</b>인지 5단계 자가진단으로 확인합니다.</div>
+      <span class="st-go">내 단계 확인 <span class="arrow">→</span></span>
+    </a>
+
+    <a class="step c2" target="_blank" href="https://gift0508.github.io/cafe/roadmap.html">
+      <div class="wm">Ⅱ</div>
+      <div class="roman"><span class="badge">Ⅱ</span></div>
+      <div class="st-name">합격 로드맵</div>
+      <div class="st-desc">내가 스스로 짠 <b>나만의 합격 로드맵</b>(며칠 걸리는지)을 확인합니다.</div>
+      <span class="st-go">내 계획 확인 <span class="arrow">→</span></span>
+    </a>
+
+    <a class="step c3" target="_blank" href="https://gift0508.github.io/cafe/schedule.html">
+      <div class="wm">Ⅲ</div>
+      <div class="roman"><span class="badge">Ⅲ</span></div>
+      <div class="st-name">학습 스케줄</div>
+      <div class="st-desc">각 단계에서 <b>무엇을·어떤 순서로</b> 하는지 학습 스케줄을 확인합니다.</div>
+      <span class="st-go">순서 확인 <span class="arrow">→</span></span>
+    </a>
+
+    <a class="step c4" target="_blank" href="https://gift0508.github.io/howto-admin-law/1%ED%96%892%ED%95%84%206%EB%8B%A8%EA%B3%84%20%ED%95%99%EC%8A%B5%EC%8B%9C%EC%8A%A4%ED%85%9C.html">
+      <div class="wm">Ⅳ</div>
+      <div class="roman"><span class="badge">Ⅳ</span><span class="daily">매일</span></div>
+      <div class="st-name">6단계 학습시스템</div>
+      <div class="st-desc"><b>매일</b> 1행2필 6단계 학습시스템으로 오늘의 학습을 실행합니다.</div>
+      <span class="st-go">오늘 학습 시작 <span class="arrow">→</span></span>
+    </a>
+
+  </div>
+
+  <div class="foot">
+    <div class="foot-line"><b>Ⅰ→Ⅱ→Ⅲ</b>은 합격이라는 항구로 가는 <b>항로</b> — 가끔 보면서 경로 이탈 여부를 확인하면 됩니다.</div>
+    <div class="foot-line"><b>Ⅳ 6단계 학습시스템</b>은 <span class="daily-mark">매일</span> 노 젓는 실제 학습 엔진입니다.</div>
+  </div>
+
+</div>
+</body>
+</html>
