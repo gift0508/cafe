@@ -239,16 +239,18 @@
 const COURSES = [
   // phase 1 = 1차, phase 2 = 2차
   // 1차 강의 수 = 시대에듀 자막차수 기준 (1차 5과목 합계)
-  // ※ 회계학은 강사 2분(원광진·양소이) 병행 — 아래는 원광진T 기준(양소이T는 문제풀이 30강)
+  // ※ 회계학은 강사 2분 병행 — 기본이론은 양소이T(68강), 문제풀이는 원광진T(25강) 기준. 양소이T 문제풀이는 30강.
   { id:"intro1",  phase:1, name:"입문이론",   lectures:8,   perDay:3, on:true,  desc:"민법 5 · 관계법규 3" },
-  { id:"base1",   phase:1, name:"기본이론",   lectures:240, perDay:3, on:true,  desc:"민법 65 · 경제학원론 65 · 관계법규 60 · 부동산학원론 50 (회계학 미등록)" },
+  { id:"base1",   phase:1, name:"기본이론",   lectures:308, perDay:3, on:true,  desc:"회계학 68 · 민법 65 · 경제학원론 65 · 관계법규 60 · 부동산학원론 50" },
   { id:"prob1",   phase:1, name:"문제풀이",   lectures:95,  perDay:3, on:true,  desc:"회계학 25 · 민법 25 · 경제학원론 20 · 관계법규 15 · 부동산학원론 10" },
   { id:"past1",   phase:1, name:"기출특강",   lectures:10,  perDay:3, on:true,  desc:"5과목 × 2강" },
   { id:"mock1",   phase:1, name:"모의고사",   lectures:20,  perDay:3, on:true,  desc:"5과목 × 4강" },
   { id:"final1",  phase:1, name:"파이널리뷰", lectures:42,  perDay:3, on:true,  desc:"부동산학원론 9 · 관계법규 9 · 민법 8 · 경제학원론 8 · 회계학 8" },
-  { id:"core2",   phase:2, name:"핵심이론",   lectures:0,   perDay:5, on:false, desc:"감정평가실무·감정평가이론·보상법규 — 강의 수 입력 필요" },
-  { id:"prob2",   phase:2, name:"문제풀이",   lectures:0,   perDay:5, on:false, desc:"2차 전과목 — 강의 수 입력 필요" },
-  { id:"final2",  phase:2, name:"파이널특강", lectures:0,   perDay:5, on:false, desc:"2차 마무리 — 강의 수 입력 필요" },
+  // 2차 강의 수 = 시대에듀 자막차수 기준 (감정평가실무·감정평가이론·감정평가 및 보상법규)
+  { id:"base2",   phase:2, name:"기본이론",   lectures:160, perDay:5, on:false, desc:"실무 56 · 이론 54 · 보상법규 50" },
+  { id:"prob2",   phase:2, name:"문제풀이",   lectures:37,  perDay:5, on:false, desc:"실무 14 · 보상법규 13 · 이론 10" },
+  { id:"mock2",   phase:2, name:"모의고사",   lectures:21,  perDay:5, on:false, desc:"보상법규 14 · 이론 4 · 실무 3" },
+  { id:"final2",  phase:2, name:"파이널리뷰", lectures:19,  perDay:5, on:false, desc:"보상법규 10 · 실무 9 (이론 미확인)" },
 ];
 
 /* ===== 시험일 자동 계산 (8월 마지막 토 / 10월 마지막 금~토) ===== */
