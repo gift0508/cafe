@@ -244,6 +244,19 @@ const RESULTS = {
   }
 };
 
+/* ===== 링크 설정 — 주소가 생기면 여기만 고치면 됩니다 ===== */
+const LINKS = {
+  cafe    : "https://cafe.naver.com/whrudgkr0508",              // 카페 메인
+  lecture : "https://www.sdedu.co.kr/cp/?cat_id=001108",        // 시대에듀 감정평가사 강의
+  boards  : {                                                   // 게시판 주소(비우면 카페 메인으로)
+    "OX 진도확인 게시판"     : "",
+    "실전 5지택일 게시판"    : "",
+    "선다 박스 혼합형 게시판" : "",
+    "강의 자율수강"          : ""
+  }
+};
+const boardURL = b => (LINKS.boards[b] || LINKS.cafe);
+
 const SUBJECTS = ["민법","경제학원론","부동산학원론","감정평가관계법규","회계학"];
 const SELF_SUBJ = ["경제학원론","회계학"];   // 카페 문제 미제공 → 본인 문제집으로 진단
 const selfNote = ()=> SELF_SUBJ.includes(curSubj)
@@ -346,8 +359,8 @@ function showResult(stage){
       </div>
     </div>
     <div class="ractions">
-      <a class="rbtn" href="https://cafe.naver.com/whrudgkr0508" target="_blank">${r.board} 바로가기 →</a>
-      <a class="rbtn sub" href="https://cafe.naver.com/whrudgkr0508" target="_blank">${r.lecture} 보러가기 →</a>
+      ${isSelf?``:`<a class="rbtn" href="${boardURL(r.board)}" target="_blank" rel="noopener noreferrer">${r.board} 바로가기 →</a>`}
+      <a class="rbtn${isSelf?``:` sub`}" href="${LINKS.lecture}" target="_blank" rel="noopener noreferrer">${r.lecture} 보러가기 →</a>
     </div>
     <button class="restart">↺ 다시 진단하기</button>
   `;
