@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>감정평가사 나의 학습 단계 자가진단</title>
+<style>
+  :root{
+    --ink:#16203A; --muted:#6B7488; --line:#E3E7EF; --paper:#F4F6FA; --card:#fff;
+    --accent:#3B5BDB; --accent-soft:#E8EDFB;
+    --s1:#5b8def; --s2:#3a4fd0; --s3:#5847d4; --s4:#7a3fc9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","맑은 고딕",sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.65;
+    -webkit-font-smoothing:antialiased; padding:30px 16px 70px;
+  }
+  .wrap{max-width:680px;margin:0 auto}
+
+  /* 헤더 */
+  .head{text-align:center;margin-bottom:26px}
+  .head .kicker{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.5px;
+    color:#fff;background:linear-gradient(100deg,#3a4fd0,#5847d4);
+    padding:6px 16px;border-radius:30px;margin-bottom:14px;
+  }
+  .head h1{font-size:25px;font-weight:800;letter-spacing:-0.6px;line-height:1.35}
+  .head h1 b{color:var(--accent)}
+  .head p{margin-top:9px;font-size:14.5px;color:var(--muted)}
+
+  /* 진행바 */
+  .progress{display:flex;gap:6px;margin:22px 0 20px}
+  .progress .dot{flex:1;height:6px;border-radius:99px;background:var(--line);transition:background .3s}
+  .progress .dot.on{background:var(--accent)}
+
+  /* 질문 카드 */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 4px 16px rgba(22,32,58,.06);padding:26px 24px;
+  }
+  .qnum{font-size:12.5px;font-weight:700;color:var(--accent);letter-spacing:0.5px;margin-bottom:8px}
+  .qtext{font-size:18px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;line-height:1.45}
+  .qhint{font-size:13px;color:var(--muted);margin-bottom:18px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    text-align:left;font:inherit;font-size:14.5px;font-weight:600;color:var(--ink);
+    background:var(--paper);border:1.5px solid var(--line);border-radius:12px;
+    padding:14px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;
+  }
+  .opt:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .opt .mark{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);
+    transition:all .15s;
+  }
+  .opt:hover .mark{border-color:var(--accent)}
+
+  .back{
+    margin-top:18px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);
+    background:none;border:none;cursor:pointer;padding:6px 0;
+  }
+  .back:hover{color:var(--accent)}
+  .back:disabled{opacity:0;cursor:default}
+
+  /* 결과 */
+  .result{display:none}
+  .result.on{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .rstage{
+    border-radius:18px;padding:30px 26px;color:#fff;text-align:center;margin-bottom:16px;
+  }
+  .rstage.s1{background:linear-gradient(155deg,#5b8def,#4a76e0)}
+  .rstage.s2{background:linear-gradient(155deg,#4a63e0,#3a4fd0)}
+  .rstage.s3{background:linear-gradient(155deg,#5847d4,#4736c0)}
+  .rstage.s4{background:linear-gradient(155deg,#7a3fc9,#5e2fae)}
+  .rstage.s5{background:linear-gradient(155deg,#e08a2e,#c9701a)}
+  .rstage.s6{background:linear-gradient(155deg,#1f9d6b,#158a5a)}
+  .rstage .rhanja{
+    display:inline-block;font-size:13px;font-weight:700;
+    background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);
+    padding:4px 14px;border-radius:30px;margin-top:12px;letter-spacing:0.5px;
+  }
+  .rstage .rlabel{font-size:13px;font-weight:700;opacity:.9;letter-spacing:1px;margin-bottom:8px}
+  .rstage .rname{font-size:30px;font-weight:900;letter-spacing:-0.8px;margin-bottom:10px}
+  .rstage .rdesc{font-size:14.5px;opacity:.95;line-height:1.6}
+
+  .rinfo{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+  .rinfo .row{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .rinfo .row:last-child{border-bottom:none}
+  .rinfo .ricon{flex:0 0 auto;font-size:20px}
+  .rinfo .rk{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px;letter-spacing:0.3px}
+  .rinfo .rv{font-size:15px;font-weight:700;color:var(--ink);line-height:1.5}
+  .rinfo .rv b{color:var(--accent)}
+
+  .ractions{display:flex;flex-direction:column;gap:10px}
+  .rbtn{
+    text-align:center;font:inherit;font-size:15px;font-weight:800;color:#fff;
+    background:var(--accent);border:none;border-radius:12px;padding:15px;cursor:pointer;
+    text-decoration:none;display:block;transition:transform .15s;
+  }
+  .rbtn:hover{transform:translateY(-2px)}
+  .rbtn.sub{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
+  .restart{
+    margin-top:6px;text-align:center;font:inherit;font-size:13px;font-weight:600;
+    color:var(--muted);background:none;border:none;cursor:pointer;padding:8px;
+  }
+  .restart:hover{color:var(--accent)}
+
+  .foot-note{text-align:center;font-size:12px;color:var(--muted);margin-top:24px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <span class="kicker">감정평가사 · 1행2필 학습 단계 자가진단</span>
+    <h1>지금 나는 <b>어느 단계</b>일까?</h1>
+    <p>4개의 질문에 답하면, 지금 내 위치와 다음 할 일이 정해집니다.</p>
+  </div>
+
+  <!-- 진행바 -->
+  <div class="progress" id="prog">
+    <div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+
+  <!-- 질문 영역 -->
+  <div class="card" id="quiz"></div>
+
+  <!-- 결과 영역 -->
+  <div class="result" id="result"></div>
+
+  <div class="foot-note">
+    ※ 이 진단은 스스로의 현재 위치를 가늠하기 위한 것입니다. 솔직하게 답할수록 정확합니다.
+  </div>
+
+</div>
+
+<script>
+/* ===== 진단 로직 =====
+   4개 질문을 순서대로. 각 질문에서 "아직 안 됨"이 나오면 그 단계로 확정하고 멈춤.
+   모두 통과하면 합격선 단계.
+   - Q1: OX 진도확인 암기 (8개 미만 → 진입)
+   - Q2: 이해/해소 여부 (이해 안 됨 → 습득)
+   - Q3: 실전 5지택일 (3개 미만 → 풀이가 필요 = 풀이 단계에 있음)
+   - Q4: 선다 박스 혼합형 (6개 이상 → 합격선 / 미만 → 풀이~합격선 경계)
+*/
+
+const QUESTIONS = [
+  {
+    num:"질문 1 / 4",
+    text:"OX 진도확인에서 10문제를 풀면, 보통 몇 개나 맞습니까?",
+    hint:"암기가 얼마나 됐는지 확인하는 질문입니다.",
+    opts:[
+      {label:"7개 이하 — 아직 헷갈리는 게 많다", stage:1},
+      {label:"8개 이상 — 대부분 외웠다", next:1}
+    ]
+  },
+  {
+    num:"질문 2 / 4",
+    text:"외운 내용을 \"왜 그런지\" 설명할 수 있습니까?",
+    hint:"단순 암기인지, 이해까지 됐는지 가르는 질문입니다.",
+    opts:[
+      {label:"막히는 부분이 있다 — 이해가 덜 됐다", stage:2},
+      {label:"대부분 이유까지 설명할 수 있다", next:1}
+    ]
+  },
+  {
+    num:"질문 3 / 4",
+    text:"실전 5지택일에서 5문제 중 몇 개나 맞습니까?",
+    hint:"이해한 내용을 실전 문제에 적용할 수 있는지 봅니다.",
+    opts:[
+      {label:"2개 이하 — 아는데 문제로는 안 풀린다", stage:3},
+      {label:"3개 이상 — 실전에서도 맞는다", next:1}
+    ]
+  },
+  {
+    num:"질문 4 / 4",
+    text:"선다 박스 혼합형에서 10문제 중 몇 개나 맞습니까?",
+    hint:"실제 시험 수준에서 합격선에 닿았는지 확인합니다.",
+    opts:[
+      {label:"5개 이하 — 합격선에 아직 못 미친다", stage:5},
+      {label:"6개 이상 — 안정적으로 합격선을 넘는다", stage:6}
+    ]
+  }
+];
+
+const RESULTS = {
+  1:{
+    cls:"s1", label:"STEP 1", name:"진입 단계",
+    desc:"개념을 처음 익히는 단계입니다. 지금은 기본 내용을 눈에 익히고 외우는 것이 우선입니다. 조급해하지 마세요 — 여기가 모든 것의 출발점입니다.",
+    goal:"OX 진도확인 <b>10문제 중 8개 이상 암기</b>",
+    board:"OX 진도확인 게시판",
+    lecture:"기본이론 강의",
+    tip:"안 외워지는 부분은 기본이론 강의로 돌아가 개념부터 다시 잡으세요."
+  },
+  2:{
+    cls:"s2", label:"STEP 2", name:"습득 단계",
+    desc:"진입은 순조롭게 되었지만 이해가 완전하지 않은 단계입니다. 강의를 통하여 왜 그런지 해소합니다.",
+    goal:"막힌 부분을 <b>강의로 해소</b>하고 이해하기",
+    board:"강의 자율수강",
+    lecture:"기본이론 + 테마특강",
+    tip:"이해가 안 되는 부분만 골라 기본이론을 다시 듣고, 헷갈리는 테마는 테마특강으로 정리하세요."
+  },
+  3:{
+    cls:"s3", label:"STEP 3", name:"풀이 단계",
+    desc:"설명이 가능하나 문제 형식으로 나오면 정답을 선택하지 못하는 단계입니다. 문제 형식별 정답을 선택하는 훈련이 필요합니다. 문제풀이 강의로 해소합니다.",
+    goal:"실전 5지택일 <b>5문제 중 3개 이상 정답</b>",
+    board:"실전 5지택일 게시판",
+    lecture:"문제풀이 강의",
+    tip:"틀린 문제는 왜 틀렸는지 문제풀이 강의로 접근법을 교정하세요."
+  },
+  4:{
+    cls:"s4", label:"STEP 4", name:"풀이 단계",
+    desc:"설명이 가능하나 문제 형식으로 나오면 정답을 선택하지 못하는 단계입니다. 문제 형식별 정답을 선택하는 훈련이 필요합니다. 문제풀이 강의로 해소합니다.",
+    goal:"실전 5지택일 <b>5문제 중 3개 이상 정답</b>",
+    board:"실전 5지택일 게시판",
+    lecture:"문제풀이 강의",
+    tip:"틀린 문제는 왜 틀렸는지 문제풀이 강의로 접근법을 교정하세요."
+  },
+  5:{
+    cls:"s5", label:"STEP 5", name:"1행 단계",
+    hanja:"一幸 · 운으로 붙는 자리",
+    desc:"합격선에 거의 왔습니다. 다만 지금 실력으로는 운이 좋아야 붙는 자리입니다. 약점을 메워 '운'을 '필연'으로 바꿀 차례입니다.",
+    goal:"선다 박스 혼합형 <b>10문제 중 6개 이상</b>으로 끌어올리기",
+    board:"선다 박스 혼합형 게시판",
+    lecture:"핵심지문총정리 + 기출특강",
+    ldense:"약점 위주로 <b>더 촘촘하고 반복적으로</b>",
+    tip:"같은 마무리 강의라도, 지금은 자꾸 틀리는 약점 지문을 집중해서 여러 번 반복해 메우세요."
+  },
+  6:{
+    cls:"s6", label:"STEP 6", name:"2필 단계",
+    hanja:"二必 · 필연으로 붙는 자리",
+    desc:"실력으로 반드시 붙는 자리에 도달했습니다. 이제 새로운 것을 늘리기보다, 이 감각을 시험날까지 흔들림 없이 유지하는 것이 관건입니다.",
+    goal:"선다 박스 혼합형 <b>10문제 중 6개 이상</b> 안정적으로 유지",
+    board:"선다 박스 혼합형 게시판",
+    lecture:"핵심지문총정리 + 기출특강",
+    ldense:"감각 유지 수준으로 <b>가볍게 반복</b>",
+    tip:"같은 마무리 강의를 무겁지 않게 반복하며 실전 감각과 시험 리듬만 유지하세요."
+  }
+};
+
+let step = 0;          // 현재 질문 인덱스
+let history = [];      // 뒤로가기용
+
+const quizEl = document.getElementById("quiz");
+const resultEl = document.getElementById("result");
+const progEl = document.getElementById("prog");
+
+function renderProgress(){
+  const dots = progEl.querySelectorAll(".dot");
+  dots.forEach((d,i)=>d.classList.toggle("on", i<=step));
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[step];
+  renderProgress();
+  quizEl.innerHTML = `
+    <div class="qnum">${q.num}</div>
+    <div class="qtext">${q.text}</div>
+    <div class="qhint">${q.hint}</div>
+    <div class="opts">
+      ${q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="mark"></span>${o.label}</button>`).join("")}
+    </div>
+    <button class="back" ${history.length===0?"disabled":""}>← 이전 질문</button>
+  `;
+  quizEl.querySelectorAll(".opt").forEach(btn=>{
+    btn.onclick=()=>choose(q.opts[+btn.dataset.i]);
+  });
+  quizEl.querySelector(".back").onclick=goBack;
+}
+
+function choose(opt){
+  history.push(step);
+  if(opt.stage){ showResult(opt.stage); return; }
+  step += 1;
+  if(step >= QUESTIONS.length){ showResult(6); return; }
+  renderQuestion();
+}
+
+function goBack(){
+  if(history.length===0) return;
+  step = history.pop();
+  resultEl.classList.remove("on");
+  quizEl.style.display="block";
+  progEl.style.display="flex";
+  renderQuestion();
+}
+
+function showResult(stage){
+  const r = RESULTS[stage];
+  quizEl.style.display="none";
+  progEl.style.display="none";
+  resultEl.className="result on";
+  resultEl.innerHTML = `
+    <div class="rstage ${r.cls}">
+      <div class="rlabel">${r.label} · 진단 결과</div>
+      <div class="rname">${r.name}</div>
+      ${r.hanja?`<div class="rhanja">${r.hanja}</div>`:``}
+      <div class="rdesc" style="margin-top:14px">${r.desc}</div>
+    </div>
+    <div class="rinfo">
+      <div class="row">
+        <div class="ricon">🎯</div>
+        <div><div class="rk">이 단계의 목표</div><div class="rv">${r.goal}</div></div>
+      </div>
+      <div class="row">
+        <div class="ricon">📋</div>
+        <div><div class="rk">지금 갈 곳</div><div class="rv">${r.board}</div></div>
+      </div>
+      <div class="row">
+        <div class="ricon">🎧</div>
+        <div><div class="rk">막히면 볼 강의</div><div class="rv"><b>${r.lecture}</b></div>${r.ldense?`<div class="rv" style="font-weight:600;color:var(--muted);font-size:13.5px;margin-top:3px">📊 학습 밀도: ${r.ldense}</div>`:``}</div>
+      </div>
+      <div class="row">
+        <div class="ricon">💡</div>
+        <div><div class="rk">한마디 조언</div><div class="rv" style="font-weight:600;color:var(--muted)">${r.tip}</div></div>
+      </div>
+    </div>
+    <div class="ractions">
+      <a class="rbtn" href="https://cafe.naver.com/whrudgkr0508" target="_blank">${r.board} 바로가기 →</a>
+      <a class="rbtn sub" href="https://cafe.naver.com/whrudgkr0508" target="_blank">${r.lecture} 보러가기 →</a>
+    </div>
+    <button class="restart">↺ 다시 진단하기</button>
+  `;
+  resultEl.querySelector(".restart").onclick=restart;
+}
+
+function restart(){
+  step=0; history=[];
+  resultEl.classList.remove("on");
+  quizEl.style.display="block";
+  progEl.style.display="flex";
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
