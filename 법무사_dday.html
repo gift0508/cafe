@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>법무사 시험 D-day · 1행2필</title>
+<style>
+  :root{
+    --night:#0A1730;         /* 밤하늘 */
+    --night-2:#16264A;
+    --line:rgba(147,166,200,.22);
+    --dim:#93A6C8;           /* 보조 */
+    --gold:#FFD45E;          /* 임박 강조 */
+    --past:#4A5878;          /* 지난 시험 */
+    --sky:#7DD3FC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:radial-gradient(130% 90% at 78% -10%,#1D3A6B 0%,#12274D 42%,var(--night) 100%);
+    background-attachment:fixed; color:#fff; min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .stars i{position:absolute;background:#fff;border-radius:50%}
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:46px 22px 64px}
+
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .track{font-size:22px;font-weight:900;letter-spacing:-.8px}
+  .track span{color:var(--sky);font-size:12.5px;font-weight:800;letter-spacing:2.2px;display:block;margin-bottom:5px}
+  .today{font-size:13px;color:var(--dim);font-weight:600}
+
+  /* 히어로 — 가장 가까운 시험 */
+  .hero{margin-top:30px;padding:34px 30px 30px;border-radius:18px;
+    background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+    border:1px solid var(--line)}
+  .hero .round{display:inline-block;font-size:13px;font-weight:900;letter-spacing:.5px;
+    background:var(--gold);color:#3A2A00;padding:5px 13px;border-radius:999px}
+  .dnum{font-size:clamp(64px,17vw,116px);font-weight:900;line-height:.92;letter-spacing:-5px;
+    font-variant-numeric:tabular-nums;margin:16px 0 6px}
+  .dnum small{font-size:.34em;letter-spacing:-1px;color:var(--dim);font-weight:800;margin-right:8px;vertical-align:.34em}
+  .hero .when{font-size:16.5px;font-weight:700;color:#DCE7FA}
+  .hero .left{font-size:13.5px;color:var(--dim);margin-top:7px;font-weight:600}
+
+  /* 시그니처 — 남은 시험 타임라인 */
+  .rail{margin-top:26px;padding:24px 22px 18px;border-radius:14px;
+    background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  .rail h2{font-size:12px;font-weight:800;letter-spacing:2.2px;color:var(--dim);margin-bottom:22px}
+  .bar{position:relative;height:2px;background:linear-gradient(90deg,var(--gold),rgba(147,166,200,.3));border-radius:2px;margin:0 6px}
+  .pin{position:absolute;top:50%;transform:translate(-50%,-50%);text-align:center;width:96px}
+  .pin i{display:block;width:11px;height:11px;border-radius:50%;background:var(--dim);margin:0 auto;
+    border:2px solid var(--night);box-shadow:0 0 0 2px rgba(147,166,200,.35)}
+  .pin.first i{background:var(--gold);box-shadow:0 0 0 3px rgba(255,212,94,.28)}
+  .pin b{display:block;font-size:11.5px;font-weight:800;margin-top:9px;color:#CFDCF2;white-space:nowrap}
+  .pin em{display:block;font-style:normal;font-size:10.5px;color:var(--dim);margin-top:2px}
+  .rail .now{position:absolute;left:0;top:50%;transform:translate(-50%,-50%);
+    width:2px;height:20px;background:var(--gold);border-radius:2px}
+  .rail-pad{position:relative;height:66px}
+
+  /* 목록 */
+  .list{margin-top:26px}
+  .list h2{font-size:12px;font-weight:800;letter-spacing:2.2px;color:var(--dim);margin-bottom:12px}
+  .row{display:flex;align-items:center;gap:14px;padding:15px 4px;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .tag{flex:0 0 auto;min-width:52px;text-align:center;font-size:12px;font-weight:900;
+    padding:5px 9px;border-radius:7px;background:rgba(125,211,252,.14);color:var(--sky)}
+  .row .info{flex:1 1 auto;min-width:0}
+  .row .date{font-size:15px;font-weight:700}
+  .row .yr{font-size:12px;color:var(--dim);font-weight:600;margin-top:2px}
+  .row .dd{flex:0 0 auto;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+  .row.soon .dd{color:var(--gold)}
+  .row.done{opacity:.42}
+  .row.done .tag{background:rgba(147,166,200,.12);color:var(--past)}
+  .row.done .dd{font-size:13px;font-weight:700;color:var(--past)}
+
+  footer{margin-top:34px;text-align:center;font-size:12.5px;color:var(--dim);line-height:1.9}
+  footer b{color:#DCE7FA}
+  .note{margin-top:18px;font-size:12px;color:var(--dim);line-height:1.7;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+
+  @media (max-width:520px){
+    .pin{width:74px}
+    .pin b{font-size:10.5px}
+    .hero{padding:26px 20px 24px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="wrap">
+  <header>
+    <div class="track"><span>1행2필 · 시험 D-DAY</span>법무사</div>
+    <div class="today" id="todayTxt">—</div>
+  </header>
+
+  <section class="hero">
+    <span class="round" id="heroRound">—</span>
+    <div class="dnum" id="heroD">—</div>
+    <div class="when" id="heroWhen">—</div>
+    <div class="left" id="heroLeft"></div>
+  </section>
+
+  <section class="rail">
+    <h2>남은 시험</h2>
+    <div class="rail-pad"><div class="bar" id="bar"><span class="now"></span></div></div>
+  </section>
+
+  <section class="list">
+    <h2>전체 일정</h2>
+    <div id="rows"></div>
+  </section>
+
+  <p class="note" id="ruleNote"></p>
+
+  <footer>
+    <b>1행2필(一幸二必)</b> · 매일의 멈춤없는 한걸음이 만듭니다<br>
+    시험일은 매년 같은 규칙으로 자동 계산됩니다. 확정 일정은 공고를 확인하세요.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TRACK = "법무사";
+  /* 시험일 규칙 — 매년 자동 계산 */
+  var RULES = [{"label": "1차", "type": "nth", "m": 8, "wd": 6, "n": 4, "desc": "8월 넷째 주 토요일"}, {"label": "2차", "type": "last", "m": 10, "wd": 5, "desc": "10월 마지막 금요일"}];
+  var WD = ['일','월','화','수','목','금','토'];
+
+  function nthWeekday(y, m, wd, n){          /* m: 1~12, wd: 0=일 */
+    var d = new Date(y, m-1, 1);
+    var shift = (wd - d.getDay() + 7) % 7;
+    return new Date(y, m-1, 1 + shift + 7*(n-1));
+  }
+  function lastWeekday(y, m, wd){
+    var d = new Date(y, m, 0);              /* 그 달 마지막 날 */
+    return new Date(y, m-1, d.getDate() - ((d.getDay() - wd + 7) % 7));
+  }
+  function build(y, r){
+    if(r.type === 'nth')  return nthWeekday(y, r.m, r.wd, r.n);
+    if(r.type === 'last') return lastWeekday(y, r.m, r.wd);
+    return new Date(y, r.m-1, r.d);
+  }
+  function fmt(d){ return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+WD[d.getDay()]+')'; }
+  function fmtShort(d){ return (d.getMonth()+1)+'월 '+d.getDate()+'일 ('+WD[d.getDay()]+')'; }
+
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  document.getElementById('todayTxt').textContent =
+    today.getFullYear()+'.'+String(today.getMonth()+1).padStart(2,'0')+'.'+String(today.getDate()).padStart(2,'0')+' 기준';
+
+  /* 올해·내년 일정 생성 */
+  var items = [];
+  [0,1].forEach(function(off){
+    var y = today.getFullYear() + off;
+    RULES.forEach(function(r){
+      var s = build(y, r);
+      var e = r.span ? new Date(s.getFullYear(), s.getMonth(), s.getDate()+r.span) : s;
+      items.push({ label:r.label, start:s, end:e, span:r.span||0, year:y,
+                   dd: Math.round((s - today) / 86400000) });
+    });
+  });
+  items.sort(function(a,b){ return a.start - b.start; });
+
+  var upcoming = items.filter(function(x){ return x.dd >= 0; });
+  var past     = items.filter(function(x){ return x.dd < 0; });
+
+  /* 히어로 — 가장 가까운 시험 */
+  if(upcoming.length){
+    var h = upcoming[0];
+    document.getElementById('heroRound').textContent = h.year + '년 ' + h.label;
+    document.getElementById('heroD').innerHTML = h.dd === 0
+      ? '<small>D</small>DAY'
+      : '<small>D-</small>' + h.dd;
+    document.getElementById('heroWhen').textContent =
+      fmt(h.start) + (h.span ? ' ~ ' + fmtShort(h.end) : '');
+    var w = Math.floor(h.dd/7), d2 = h.dd%7;
+    document.getElementById('heroLeft').textContent =
+      h.dd === 0 ? '오늘이 시험일입니다' : ('약 ' + w + '주 ' + (d2 ? d2+'일' : '') + ' 남았습니다');
+  }
+
+  /* 타임라인 — 다가오는 시험 최대 4개 */
+  var bar = document.getElementById('bar');
+  var pins = upcoming.slice(0,4);
+  if(pins.length){
+    var max = pins[pins.length-1].dd || 1;
+    pins.forEach(function(p, i){
+      var el = document.createElement('span');
+      el.className = 'pin' + (i===0 ? ' first' : '');
+      el.style.left = (max ? (p.dd/max)*100 : 0) + '%';
+      el.innerHTML = '<i></i><b>' + p.label + '</b><em>' + p.year + '.' + (p.start.getMonth()+1) + '</em>';
+      bar.appendChild(el);
+    });
+  }
+
+  /* 전체 목록 */
+  var rows = document.getElementById('rows');
+  items.forEach(function(x){
+    var div = document.createElement('div');
+    var soon = x.dd >= 0 && x.dd <= 60;
+    div.className = 'row' + (x.dd < 0 ? ' done' : (soon ? ' soon' : ''));
+    div.innerHTML =
+      '<span class="tag">' + x.label + '</span>' +
+      '<span class="info"><span class="date">' + fmtShort(x.start) +
+        (x.span ? ' ~ ' + fmtShort(x.end) : '') + '</span>' +
+        '<span class="yr">' + x.year + '년</span></span>' +
+      '<span class="dd">' + (x.dd < 0 ? '종료' : (x.dd === 0 ? 'D-DAY' : 'D-' + x.dd)) + '</span>';
+    rows.appendChild(div);
+  });
+
+  document.getElementById('ruleNote').textContent =
+    TRACK + ' 시험 기준 — ' + RULES.map(function(r){ return r.label + ' ' + r.desc; }).join(' · ');
+
+  /* 배경 별 */
+  var s = document.getElementById('stars'), html = '';
+  for(var i=0;i<70;i++){
+    html += '<i style="left:'+(Math.random()*100).toFixed(1)+'%;top:'+(Math.random()*100).toFixed(1)+
+            '%;width:'+(Math.random()*1.9+.6).toFixed(1)+'px;height:'+(Math.random()*1.9+.6).toFixed(1)+
+            'px;opacity:'+(Math.random()*.5+.15).toFixed(2)+'"></i>';
+  }
+  s.innerHTML = html;
+})();
+</script>
+</body>
+</html>
