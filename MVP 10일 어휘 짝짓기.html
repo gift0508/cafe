@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVP 10일 어휘 짝짓기 · 1행2필</title>
+<style>
+  :root{--navy:#16203A;--gold:#C9A24B;--paper:#F4F6FA;--card:#fff;--line:#E3E7EF;--ink:#16203A;--muted:#6B7488;--ok:#16A34A;--bad:#E5484D;--sel:#3B5BDB;--shadow:0 1px 3px rgba(22,32,58,.08),0 8px 24px rgba(22,32,58,.05);}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+  header{background:var(--navy);color:#fff;padding:14px 18px}
+  .brand{font-weight:800;font-size:18px;letter-spacing:-.02em}
+  .brand b{color:var(--gold)} .brand span{font-size:12px;color:#9FB0D4;font-weight:600;margin-left:8px}
+  main{max-width:880px;margin:0 auto;padding:16px 14px 60px}
+  .days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .days button{font:inherit;font-weight:800;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 0;cursor:pointer;flex:1;min-width:56px;position:relative}
+  .days button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .days button .chk{position:absolute;top:-6px;right:-4px;background:var(--ok);color:#fff;font-size:10px;width:16px;height:16px;border-radius:50%;display:grid;place-items:center}
+  .bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar .t{font-weight:800;font-size:16px} .bar .prog{flex:1;height:9px;background:var(--line);border-radius:99px;overflow:hidden}
+  .bar .prog i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s} .bar .n{font-size:13px;color:var(--muted);font-weight:700}
+  .hint{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .col h3{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:8px;text-align:center;letter-spacing:.02em}
+  .col .cards{display:flex;flex-direction:column;gap:8px}
+  .word{height:66px;font:inherit;font-weight:700;font-size:15px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:11px;padding:0 8px;cursor:pointer;display:grid;place-items:center;text-align:center;transition:border-color .15s,background .15s;box-shadow:var(--shadow)}
+  .word:hover{border-color:var(--sel)} .word.sel{border-color:var(--sel);background:#EEF2FE}
+  .word.ok{border-color:var(--ok);background:#EAF7EF;color:var(--ok);cursor:default;box-shadow:none}
+  .word.bad{border-color:var(--bad);background:#FDECEC;animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .flip{height:66px;perspective:900px;cursor:pointer}
+  .flip .fi{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s;box-shadow:var(--shadow);border-radius:11px}
+  .flip.flipped .fi{transform:rotateY(180deg)}
+  .flip .ff,.flip .fb{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:11px;border:2px solid var(--line);background:var(--card);padding:0 8px;text-align:center}
+  .flip .ff{display:grid;place-items:center;font-weight:700;font-size:15px}
+  .flip .fb{transform:rotateY(180deg);border-color:var(--ok);background:#EAF7EF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .flip .fb b{font-size:14px;color:#0f7a37;font-weight:800}
+  .flip .fb small{font-size:10.5px;color:#2f8f5a;font-weight:600;line-height:1.2}
+  .flip:hover .ff{border-color:var(--sel)}
+  .flip.done-hover:hover .ff{border-color:var(--line)}
+  .flip.bad .ff{border-color:var(--bad);background:#FDECEC;animation:shake .4s}
+  .done{display:none;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:16px;box-shadow:var(--shadow)}
+  .done.show{display:block;animation:pop .3s} @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+  .done .big{font-size:20px;font-weight:800;color:var(--ok)} .done .sub{font-size:13px;color:var(--muted);margin-top:6px}
+  .done .btns{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .btn{font:inherit;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 16px;cursor:pointer}
+  .btn.pri{background:var(--navy);border-color:var(--navy);color:#fff}
+  .foot{text-align:center;color:var(--muted);font-size:11.5px;margin-top:22px}
+  @media(max-width:560px){.word,.flip .ff{font-size:13.5px}.flip .fb b{font-size:12.5px}.flip .fb small{font-size:9.5px}.match{gap:9px}}
+</style></head>
+<body>
+<header><div class="brand"><b>1행2필</b> MVP 10일 어휘 짝짓기<span>단어 ↔ 유의어 · 뒤집으면 뜻+유의어군</span></div></header>
+<main>
+  <div class="days" id="days"></div>
+  <div class="bar"><span class="t" id="dayTitle">Day 1</span><span class="prog"><i id="prog"></i></span><span class="n" id="cnt">0/10</span></div>
+  <p class="hint">왼쪽 <b>단어</b>를 누르고 오른쪽에서 <b>같은 뜻의 유의어</b>를 누르세요. 맞으면 카드가 <b>뒤집히며 한국어 뜻과 다른 유의어들</b>이 함께 나타납니다.</p>
+  <div class="match">
+    <div class="col"><h3>WORD (단어)</h3><div class="cards" id="left"></div></div>
+    <div class="col"><h3>SYNONYM (유의어)</h3><div class="cards" id="right"></div></div>
+  </div>
+  <div class="done" id="done">
+    <div class="big">🎉 Day <span id="doneDay"></span> 완료!</div>
+    <div class="sub" id="doneSub"></div>
+    <div class="btns"><button class="btn" id="retry">다시 풀기</button><button class="btn pri" id="next">다음 Day ▶</button></div>
+  </div>
+  <p class="foot">1행2필 · 하루 10문제 · 매칭이 곧 암기입니다.</p>
+</main>
+<script>
+const DAYS=[[{"w": "innocent", "s": "blameless", "k": "무죄의·순진한", "x": "guiltless, naive"}, {"w": "hostile", "s": "antagonistic", "k": "적대적인", "x": "unfriendly, adverse"}, {"w": "deceased", "s": "dead", "k": "사망한·고인이 된", "x": "departed, defunct"}, {"w": "multiple", "s": "numerous", "k": "다수의", "x": "manifold, various"}, {"w": "exert", "s": "wield", "k": "발휘하다", "x": "exercise, apply"}, {"w": "glorify", "s": "extol", "k": "찬미하다", "x": "exalt, celebrate"}, {"w": "antithesis", "s": "opposite", "k": "정반대", "x": "contrast, reverse"}, {"w": "proficient", "s": "adept", "k": "능숙한", "x": "skilled, expert"}, {"w": "whim", "s": "caprice", "k": "변덕", "x": "fancy, impulse"}, {"w": "squalid", "s": "filthy", "k": "지저분한·누추한", "x": "sordid, grimy"}], [{"w": "artificial", "s": "synthetic", "k": "인공적인", "x": "fake, man-made"}, {"w": "formidable", "s": "daunting", "k": "만만찮은·가공할", "x": "fearsome, redoubtable"}, {"w": "drastic", "s": "extreme", "k": "극단적인", "x": "severe, radical"}, {"w": "primitive", "s": "primeval", "k": "원시적인", "x": "ancient, crude"}, {"w": "esteem", "s": "respect", "k": "존중하다", "x": "regard, admire"}, {"w": "usurp", "s": "arrogate", "k": "찬탈하다", "x": "appropriate, commandeer"}, {"w": "entrepreneur", "s": "businessman", "k": "기업가", "x": "mogul, tycoon"}, {"w": "crafty", "s": "cunning", "k": "교활한", "x": "sly, wily"}, {"w": "stationary", "s": "immobile", "k": "정지한", "x": "fixed, motionless"}, {"w": "irksome", "s": "annoying", "k": "성가신", "x": "tiresome, vexing"}], [{"w": "beneficial", "s": "advantageous", "k": "유익한", "x": "helpful, favorable"}, {"w": "acknowledge", "s": "admit", "k": "인정하다", "x": "recognize, concede"}, {"w": "outspoken", "s": "frank", "k": "솔직한", "x": "candid, blunt"}, {"w": "laud", "s": "praise", "k": "칭찬하다", "x": "extol, applaud"}, {"w": "rigid", "s": "stiff", "k": "엄격한·뻣뻣한", "x": "inflexible, strict"}, {"w": "rapture", "s": "ecstasy", "k": "황홀", "x": "bliss, elation"}, {"w": "impasse", "s": "deadlock", "k": "교착상태", "x": "stalemate, standstill"}, {"w": "epitome", "s": "embodiment", "k": "전형·축소판", "x": "quintessence, paragon"}, {"w": "dispel", "s": "disperse", "k": "쫓아내다·없애다", "x": "dissipate, banish"}, {"w": "pester", "s": "harass", "k": "괴롭히다·조르다", "x": "badger, hound"}], [{"w": "illustrate", "s": "demonstrate", "k": "설명·예시하다", "x": "exemplify, depict"}, {"w": "prescribe", "s": "dictate", "k": "처방·규정하다", "x": "ordain, stipulate"}, {"w": "buttress", "s": "reinforce", "k": "지지하다", "x": "bolster, support"}, {"w": "disprove", "s": "refute", "k": "반증하다", "x": "rebut, invalidate"}, {"w": "modify", "s": "alter", "k": "수정하다", "x": "amend, adjust"}, {"w": "flout", "s": "disregard", "k": "무시·비웃다", "x": "defy, scorn"}, {"w": "ostensible", "s": "seeming", "k": "표면상의", "x": "purported, professed"}, {"w": "pragmatic", "s": "practical", "k": "실용적인", "x": "realistic, sensible"}, {"w": "congenial", "s": "agreeable", "k": "마음 맞는", "x": "amiable, compatible"}, {"w": "brazen", "s": "bold", "k": "뻔뻔한", "x": "shameless, impudent"}], [{"w": "deprive", "s": "divest", "k": "박탈하다", "x": "strip, dispossess"}, {"w": "evaporate", "s": "vaporize", "k": "증발하다", "x": "dissipate, evanesce"}, {"w": "bankrupt", "s": "insolvent", "k": "파산한", "x": "ruined, broke"}, {"w": "conventional", "s": "traditional", "k": "전통적·관습적인", "x": "orthodox, customary"}, {"w": "prodigal", "s": "wasteful", "k": "낭비하는", "x": "extravagant, lavish"}, {"w": "jubilant", "s": "elated", "k": "환호하는", "x": "joyful, exultant"}, {"w": "plunder", "s": "pillage", "k": "약탈하다", "x": "loot, ravage"}, {"w": "upheaval", "s": "turmoil", "k": "격변", "x": "disruption, convulsion"}, {"w": "abide", "s": "endure", "k": "견디다·머무르다", "x": "tolerate, bear"}, {"w": "zest", "s": "enthusiasm", "k": "열정·풍미", "x": "gusto, relish"}], [{"w": "thoughtful", "s": "considerate", "k": "사려 깊은", "x": "attentive, caring"}, {"w": "surplus", "s": "excess", "k": "잉여·과잉", "x": "overplus, glut"}, {"w": "grief", "s": "sorrow", "k": "슬픔·비탄", "x": "anguish, woe"}, {"w": "seize", "s": "grab", "k": "붙잡다·장악하다", "x": "grasp, snatch"}, {"w": "resign", "s": "quit", "k": "사임하다", "x": "abdicate, relinquish"}, {"w": "belligerent", "s": "combative", "k": "호전적인", "x": "aggressive, bellicose"}, {"w": "stagnant", "s": "inactive", "k": "정체된", "x": "static, dormant"}, {"w": "invigorate", "s": "energize", "k": "활기를 주다", "x": "revitalize, refresh"}, {"w": "disparate", "s": "distinct", "k": "이질적인", "x": "dissimilar, divergent"}, {"w": "tribulation", "s": "hardship", "k": "고난", "x": "ordeal, affliction"}], [{"w": "fraud", "s": "deception", "k": "사기", "x": "swindle, deceit"}, {"w": "provisional", "s": "temporary", "k": "임시의", "x": "interim, tentative"}, {"w": "consume", "s": "devour", "k": "소비하다", "x": "ingest, expend"}, {"w": "culprit", "s": "offender", "k": "범인", "x": "perpetrator, wrongdoer"}, {"w": "talkative", "s": "garrulous", "k": "수다스러운", "x": "loquacious, voluble"}, {"w": "vanquish", "s": "defeat", "k": "정복하다", "x": "conquer, subdue"}, {"w": "nonchalant", "s": "indifferent", "k": "무관심·태연한", "x": "unconcerned, casual"}, {"w": "interminable", "s": "endless", "k": "끝없는", "x": "ceaseless, perpetual"}, {"w": "momentous", "s": "significant", "k": "중대한", "x": "weighty, crucial"}, {"w": "tortuous", "s": "winding", "k": "구불구불·복잡한", "x": "sinuous, circuitous"}], [{"w": "scorn", "s": "disdain", "k": "경멸하다", "x": "contempt, derision"}, {"w": "apparent", "s": "obvious", "k": "명백한", "x": "evident, manifest"}, {"w": "infer", "s": "deduce", "k": "추론하다", "x": "surmise, conclude"}, {"w": "humane", "s": "compassionate", "k": "인도적인", "x": "merciful, benevolent"}, {"w": "cardinal", "s": "fundamental", "k": "기본적·주요한", "x": "principal, chief"}, {"w": "devoid", "s": "lacking", "k": "~이 없는", "x": "destitute, bereft"}, {"w": "vindicate", "s": "justify", "k": "정당함을 입증하다", "x": "exonerate, absolve"}, {"w": "furtive", "s": "stealthy", "k": "은밀한", "x": "surreptitious, clandestine"}, {"w": "archaic", "s": "obsolete", "k": "고대의·낡은", "x": "antiquated, outdated"}, {"w": "pundit", "s": "expert", "k": "전문가·권위자", "x": "authority, savant"}], [{"w": "dexterous", "s": "adroit", "k": "손재주 있는·능숙한", "x": "deft, nimble"}, {"w": "distort", "s": "twist", "k": "왜곡하다", "x": "warp, contort"}, {"w": "conform", "s": "comply", "k": "순응하다", "x": "adhere, obey"}, {"w": "innate", "s": "inborn", "k": "타고난", "x": "inherent, congenital"}, {"w": "stimulate", "s": "arouse", "k": "자극하다", "x": "incite, spur"}, {"w": "monetary", "s": "financial", "k": "통화·금전의", "x": "fiscal, pecuniary"}, {"w": "discrepancy", "s": "disparity", "k": "불일치·차이", "x": "divergence, inconsistency"}, {"w": "preclude", "s": "prevent", "k": "막다·못하게 하다", "x": "forestall, avert"}, {"w": "frantic", "s": "frenzied", "k": "제정신이 아닌", "x": "frenetic, hectic"}, {"w": "camaraderie", "s": "fellowship", "k": "동료애", "x": "comradeship, solidarity"}], [{"w": "exhaust", "s": "deplete", "k": "고갈시키다·지치게 하다", "x": "drain, sap"}, {"w": "overwhelm", "s": "overpower", "k": "압도하다", "x": "overcome, swamp"}, {"w": "prevail", "s": "dominate", "k": "만연·우세하다", "x": "predominate, reign"}, {"w": "subtle", "s": "delicate", "k": "미묘한", "x": "nuanced, faint"}, {"w": "contradict", "s": "gainsay", "k": "반박·모순되다", "x": "dispute, oppose"}, {"w": "laborious", "s": "arduous", "k": "힘든·고된", "x": "strenuous, toilsome"}, {"w": "sporadic", "s": "intermittent", "k": "산발적인", "x": "occasional, irregular"}, {"w": "prolong", "s": "extend", "k": "연장하다", "x": "protract, lengthen"}, {"w": "transient", "s": "fleeting", "k": "일시적인", "x": "ephemeral, transitory"}, {"w": "fractious", "s": "irritable", "k": "성마른", "x": "peevish, querulous"}]];
+const KEY="ilhaeng2pil_match_v1";const mem={};
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{done:[],wrong:{}}}catch(e){return mem.d||{done:[],wrong:{}}}};
+const save=o=>{try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){mem.d=o}};
+let state=load(),cur=0,matched,sel,wrongCount;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function esc(s){return (s+"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function renderDays(){
+  const el=document.getElementById("days");
+  el.innerHTML=DAYS.map((_,i)=>`<button data-d="${i}" class="${i===cur?'on':''}">Day ${i+1}${state.done.includes(i)?'<span class="chk">✓</span>':''}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{cur=+b.dataset.d;loadDay()});
+}
+function loadDay(){
+  matched=new Set();sel=null;wrongCount=0;
+  document.getElementById("done").classList.remove("show");
+  document.getElementById("dayTitle").textContent="Day "+(cur+1);
+  renderDays();
+  const day=DAYS[cur],wmap={};day.forEach(p=>wmap[p.w]=p.s);window._wm=wmap;
+  const L=document.getElementById("left"),R=document.getElementById("right");
+  L.innerHTML=shuffle(day).map(p=>`<button class="word" data-w="${esc(p.w)}">${esc(p.w)}</button>`).join("");
+  R.innerHTML=shuffle(day).map(p=>`<div class="flip" data-s="${esc(p.s)}"><div class="fi"><div class="ff">${esc(p.s)}</div><div class="fb"><b>${esc(p.k)}</b><small>= ${esc(p.s)}${p.x?", "+esc(p.x):""}</small></div></div></div>`).join("");
+  L.querySelectorAll(".word").forEach(b=>b.onclick=()=>clickL(b));
+  R.querySelectorAll(".flip").forEach(b=>b.onclick=()=>clickR(b));
+  updateBar();
+}
+function clearSel(){document.querySelectorAll(".word.sel").forEach(x=>x.classList.remove("sel"))}
+function clickL(b){if(b.classList.contains("ok"))return;clearSel();sel=b;b.classList.add("sel")}
+function clickR(b){
+  if(b.classList.contains("flipped"))return;
+  if(!sel){b.classList.add("bad");setTimeout(()=>b.classList.remove("bad"),400);return;}
+  const w=sel.dataset.w,s=b.dataset.s;
+  if(window._wm[w]===s){
+    sel.classList.remove("sel");sel.classList.add("ok");
+    b.classList.add("flipped","done-hover");
+    matched.add(w);sel=null;updateBar();
+    if(matched.size===DAYS[cur].length)finish();
+  }else{
+    wrongCount++;b.classList.add("bad");const s0=sel;s0.classList.add("bad");
+    setTimeout(()=>{b.classList.remove("bad");s0.classList.remove("bad","sel");sel=null;},450);
+  }
+}
+function updateBar(){const n=matched?matched.size:0,t=DAYS[cur].length;document.getElementById("cnt").textContent=n+"/"+t;document.getElementById("prog").style.width=(n/t*100)+"%"}
+function finish(){
+  if(!state.done.includes(cur))state.done.push(cur);
+  const prev=state.wrong[cur];state.wrong[cur]=(prev!==undefined?Math.min(prev,wrongCount):wrongCount);
+  save(state);renderDays();
+  document.getElementById("doneDay").textContent=cur+1;
+  document.getElementById("doneSub").textContent=wrongCount===0?"한 번도 안 틀렸어요! 완벽합니다.":("오답 "+wrongCount+"회 — 다시 풀어 만점에 도전하세요.");
+  document.getElementById("next").style.display=cur<DAYS.length-1?"inline-block":"none";
+  document.getElementById("done").classList.add("show");
+}
+document.getElementById("retry").onclick=loadDay;
+document.getElementById("next").onclick=()=>{if(cur<DAYS.length-1){cur++;loadDay();window.scrollTo(0,0)}};
+loadDay();
+</script></body></html>
