@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 학습 | 시대에듀 법무사</title>
+<style>
+:root{
+  --bg-dark:#070b0e;
+  --bg-gradient:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  --glass:rgba(255,255,255,0.05);
+  --glass-border:rgba(255,255,255,0.10);
+  --gold:#d4af37;
+  --gold-grad:linear-gradient(to right,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c);
+  --cyan:#00f2fe;
+  --green:#20bf6b;
+  --red:#ff0844;
+  --text:#fff;
+  --text-sub:#a8b2d1;
+  --r:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:2vh 2vw;min-height:100vh;background:var(--bg-dark);color:var(--text);
+  overflow-x:hidden;-webkit-text-size-adjust:100%;
+  font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','맑은 고딕',sans-serif;
+  display:flex;flex-direction:column;align-items:center}
+.wrap{width:100%;max-width:820px}
+
+/* 헤더 */
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.brand{font-size:0.8rem;color:var(--text-sub);font-weight:700;letter-spacing:.02em}
+h1{margin:2px 0 0;font-size:1.55rem;font-weight:800;
+  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.date{font-size:0.86rem;color:var(--text-sub);text-align:right}
+.date b{color:var(--cyan)}
+.refresh{margin-top:4px;background:var(--glass);border:1px solid var(--glass-border);color:var(--text-sub);
+  border-radius:20px;padding:5px 13px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:.2s}
+.refresh:hover{color:#fff;border-color:var(--cyan)}
+
+/* 종합 배너 */
+.hero{margin:14px 0 6px;padding:22px 24px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(0,242,254,0.10),rgba(212,175,55,0.06));
+  border:1px solid var(--glass-border);display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.hero .num{font-size:3.1rem;font-weight:800;line-height:1;color:var(--cyan);
+  text-shadow:0 0 24px rgba(0,242,254,.35)}
+.hero .lbl{font-size:0.95rem;color:var(--text-sub);font-weight:700}
+.hero .lbl b{color:#fff}
+.hero .sub{margin-top:6px;font-size:0.82rem;color:var(--text-sub)}
+.hero-right{margin-left:auto;text-align:right;font-size:0.82rem;color:var(--text-sub);line-height:1.7}
+.hero-right b{color:var(--gold);font-size:1.05rem}
+
+/* 엔진 카드 */
+.engine{margin-top:16px;border:1px solid var(--glass-border);border-radius:16px;
+  background:var(--glass);overflow:hidden}
+.eng-head{display:flex;align-items:center;gap:10px;padding:14px 18px;
+  border-bottom:1px solid var(--glass-border);background:rgba(0,0,0,.22)}
+.eng-dot{width:10px;height:10px;border-radius:50%;flex:none}
+.eng-name{font-weight:800;font-size:1.05rem}
+.eng-avail{margin-left:auto;font-size:0.9rem;font-weight:800;color:var(--cyan);white-space:nowrap}
+.eng-avail small{color:var(--text-sub);font-weight:600}
+.go{margin-left:12px;flex:none;text-decoration:none;background:var(--gold-grad);color:#1a1a1a;
+  font-weight:800;font-size:0.85rem;padding:8px 16px;border-radius:22px;white-space:nowrap;
+  transition:transform .15s,box-shadow .15s}
+.go:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,175,55,.30)}
+.go.muted{background:var(--glass);color:var(--text-sub);border:1px solid var(--glass-border)}
+
+.subj{padding:11px 18px;border-bottom:1px solid rgba(255,255,255,.05)}
+.subj:last-child{border-bottom:none}
+.subj-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.subj-name{font-weight:700;font-size:0.96rem}
+.subj-avail{font-size:0.85rem;font-weight:800;color:var(--cyan)}
+.subj-avail.zero{color:var(--text-sub)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:0.72rem;font-weight:700;padding:4px 9px;border-radius:8px;
+  border:1px solid var(--glass-border);background:rgba(0,0,0,.25);color:var(--text-sub);white-space:nowrap}
+.chip.open{color:#fff;border-color:rgba(0,242,254,.4);background:rgba(0,242,254,.10)}
+.chip.wait{opacity:.7}
+.chip.clear{color:var(--gold);border-color:rgba(212,175,55,.35)}
+.chip b{color:inherit}
+.empty-eng{padding:16px 18px;color:var(--text-sub);font-size:0.88rem;display:flex;
+  justify-content:space-between;align-items:center;gap:12px}
+
+.foot{margin:22px 4px 6px;font-size:0.76rem;color:var(--text-sub);line-height:1.7}
+.note{margin-top:14px;padding:12px 16px;border-radius:12px;background:rgba(0,0,0,.25);
+  border:1px solid var(--glass-border);font-size:0.8rem;color:var(--text-sub);line-height:1.7}
+.brand-logo{margin:26px auto 4px;text-align:center;font-weight:800;font-size:0.9rem;
+  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@media(max-width:520px){
+  .hero .num{font-size:2.4rem}
+  h1{font-size:1.3rem}
+  .hero-right{margin-left:0;text-align:left;width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand">시대에듀 법무사</div>
+      <h1>오늘의 학습</h1>
+    </div>
+    <div>
+      <div class="date" id="date"></div>
+      <button class="refresh" id="refreshBtn">↻ 새로고침</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div>
+      <div class="num" id="grandTotal">0</div>
+    </div>
+    <div>
+      <div class="lbl">지금 풀 수 있는 문제 <b id="engCount">0</b>개 엔진</div>
+      <div class="sub" id="heroSub">열린 단계에 대기 중인 문제입니다</div>
+    </div>
+    <div class="hero-right">
+      누적 완료 <b id="clearedTotal">0</b><br>
+      대기 풀 <b id="waitTotal">0</b>
+    </div>
+  </div>
+
+  <div id="engines"></div>
+
+  <div class="note" id="note"></div>
+
+  <div class="brand-logo">시대에듀</div>
+  <div class="foot">
+    각 엔진의 진도는 이 기기에 저장된 값을 그대로 읽어 표시합니다. 이 페이지는 기록을 변경하지 않습니다.
+  </div>
+</div>
+
+<script>
+/* ────────────────────────────────────────────
+   엔진 설정 — 새 선택형 엔진 추가 시 이 배열에만 등록
+   file: 같은 폴더 기준 상대경로 / prefix: localStorage 키 접두 / cap: 단계 정원
+──────────────────────────────────────────── */
+var ENGINES = [
+  { name:'5지택일 (헌법·상법·민법·부등법·공탁법·민사집행·상업등기·비송)', file:'beommusa_select.html',
+    prefix:'bmb_',  color:'#00f2fe', cap:{1:20,2:20,3:30,4:40,5:60,6:80} },
+  { name:'선다박스 혼합형 (조합·개수형)', file:'beommusa_combo.html',
+    prefix:'bmc_', color:'#d4af37', cap:{1:10,2:10,3:10,4:10,5:10,6:10} }
+];
+
+function readJSON(key){
+  try{ var v=localStorage.getItem(key); return v?JSON.parse(v):null; }catch(e){ return null; }
+}
+
+/* 엔진과 동일한 오픈 판정: 1단계 항상 열림, 2~6은 _open 플래그(없으면 정원충족) */
+function isStageOpen(st, cnt, cap, openFlags){
+  if(st===1) return true;
+  if(openFlags && openFlags[st]===true) return true;
+  if(openFlags && openFlags[st]===false) return false;
+  return (typeof cap==='number') ? (cnt>=cap) : (cnt>0);
+}
+
+function analyzeEngine(cfg){
+  var db = readJSON(cfg.prefix+'db_v1');
+  if(!db) return { started:false };
+  var subjects = Object.keys(db).filter(function(k){ return db[k] && typeof db[k]==='object' && db[k][0]!==undefined; });
+  var out = { started:true, subjects:[], avail:0, cleared:0, wait:0 };
+  subjects.forEach(function(su){
+    var st = db[su];
+    var openFlags = st._open || null;
+    var stages = [];
+    var sAvail = 0;
+    for(var i=1;i<=6;i++){
+      var cnt = (st[i]||[]).length;
+      var cap = cfg.cap[i];
+      var open = isStageOpen(i, cnt, cap, openFlags);
+      if(open) sAvail += cnt;
+      stages.push({ i:i, cnt:cnt, cap:cap, open:open });
+    }
+    var wait = (st[0]||[]).length;
+    var clear = (st.clear||[]).length;
+    out.avail += sAvail; out.cleared += clear; out.wait += wait;
+    out.subjects.push({ name:su, stages:stages, avail:sAvail, wait:wait, clear:clear });
+  });
+  return out;
+}
+
+function render(){
+  var d = new Date();
+  var wd = ['일','월','화','수','목','금','토'][d.getDay()];
+  document.getElementById('date').innerHTML =
+    d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+' <b>('+wd+')</b>';
+
+  var host = document.getElementById('engines');
+  host.innerHTML = '';
+  var grand=0, clearedAll=0, waitAll=0, activeEngines=0;
+
+  ENGINES.forEach(function(cfg){
+    var a = analyzeEngine(cfg);
+    var card = document.createElement('div');
+    card.className = 'engine';
+
+    if(!a.started){
+      card.innerHTML =
+        '<div class="eng-head"><span class="eng-dot" style="background:'+cfg.color+'"></span>'
+        + '<span class="eng-name">'+cfg.name+'</span></div>'
+        + '<div class="empty-eng"><span>아직 시작하지 않은 엔진입니다.</span>'
+        + '<a class="go" href="'+cfg.file+'">시작하기 →</a></div>';
+      host.appendChild(card);
+      return;
+    }
+
+    activeEngines++;
+    grand += a.avail; clearedAll += a.cleared; waitAll += a.wait;
+
+    var head = '<div class="eng-head"><span class="eng-dot" style="background:'+cfg.color+'"></span>'
+      + '<span class="eng-name">'+cfg.name+'</span>'
+      + '<span class="eng-avail">'+a.avail+'<small> 문제 대기</small></span>'
+      + '<a class="go'+(a.avail>0?'':' muted')+'" href="'+cfg.file+'">'
+      + (a.avail>0?'지금 풀기 →':'열기')+'</a></div>';
+
+    var body = '';
+    a.subjects.forEach(function(s){
+      var chips = '';
+      s.stages.forEach(function(st){
+        var capTxt = (typeof st.cap==='number')?('/'+st.cap):'';
+        var cls = 'chip'+(st.open?(st.cnt>0?' open':''):'');
+        chips += '<span class="'+cls+'">'+st.i+'단계 <b>'+st.cnt+capTxt+'</b>'
+          + (st.open?'':' 🔒')+'</span>';
+      });
+      chips += '<span class="chip wait">대기 <b>'+s.wait+'</b></span>';
+      chips += '<span class="chip clear">완료 <b>'+s.clear+'</b></span>';
+      body += '<div class="subj"><div class="subj-top">'
+        + '<span class="subj-name">'+s.name+'</span>'
+        + '<span class="subj-avail'+(s.avail>0?'':' zero')+'">'+s.avail+'문제</span></div>'
+        + '<div class="chips">'+chips+'</div></div>';
+    });
+
+    card.innerHTML = head + body;
+    host.appendChild(card);
+  });
+
+  document.getElementById('grandTotal').textContent = grand;
+  document.getElementById('engCount').textContent = activeEngines;
+  document.getElementById('clearedTotal').textContent = clearedAll;
+  document.getElementById('waitTotal').textContent = waitAll;
+  document.getElementById('heroSub').textContent =
+    grand>0 ? '열린 단계에 대기 중인 문제입니다 · 엔진을 눌러 바로 학습하세요'
+            : '지금 열린 단계에 풀 문제가 없습니다 · 대기 풀에서 다음 세트가 준비됩니다';
+
+  var noteEl = document.getElementById('note');
+  if(activeEngines===0){
+    noteEl.innerHTML = '아직 학습을 시작한 엔진이 없습니다. 위 <b>시작하기</b> 버튼으로 각 엔진에 들어가면, '
+      + '이 기기의 진도가 여기에 모여 표시됩니다.';
+    noteEl.style.display='block';
+  } else {
+    noteEl.style.display='none';
+  }
+}
+
+document.getElementById('refreshBtn').addEventListener('click', render);
+window.addEventListener('focus', render);
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) render(); });
+render();
+</script>
+</body>
+</html>
