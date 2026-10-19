@@ -345,6 +345,9 @@ body.lay-col.docked-s,body.lay-col.docked-m,body.lay-col.docked-l{padding-right:
 .ptbWrite{margin:-4px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .bigslot #writeCard .free textarea{min-height:60vh}
 .bigslot #writeCard{padding:16px 22px}
+.fullbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--surface-2);font-size:13px}
+.fullbar .btn{font-size:13px;padding:6px 12px}
+.fullbar .meta{flex:1;min-width:160px}
 </style>
 </head>
 <body>
@@ -483,6 +486,7 @@ body.lay-col.docked-s,body.lay-col.docked-m,body.lay-col.docked-l{padding-right:
         <option value="">모든 문제</option><option value="new">아직 안 푼 문제</option><option value="rw">재작성하기에 모은 문제</option><option value="dn">풀이한 문제</option>
       </select>
     </div>
+    <div class="fullbar" id="fullbar"></div>
     <div class="mlist" id="mlist"></div>
   </div>
 </div>
@@ -615,7 +619,7 @@ function renderSubj(){
     return '<button class="sj'+(l===SUBJ?' on':'')+'" onclick="pickSubj(\''+l+'\')">'+l+'<small>'+(a.length?o:'—')+'</small></button>'}).join("");
   $("#openinfo").innerHTML=PROBS.length?'📚 <b>'+esc(SUBJ)+'</b> 수록문제 <b>'+PROBS.length+'</b>개 — 📂 문제불러오기에서 목차별로 골라 푸세요':'';
 }
-function pickSubj(l){SUBJ=l;try{PA.matchSubject=l}catch(e){}build();renderSubj();if(view==="load"||$("#loadModal").classList.contains("on"))renderLoad();if(view!=="write")showView(view)}
+function pickSubj(l){SUBJ=l;try{PA.matchSubject=l}catch(e){}build();renderSubj();renderFull();if(view==="load"||$("#loadModal").classList.contains("on"))renderLoad();if(view!=="write")showView(view)}
 function build(){
   PROBS=ALL.filter(function(r){return r.subject===SUBJ}).map(buildProb);
   PROBS.sort(function(a,b){return (STG.indexOf(a.stage)-STG.indexOf(b.stage))||(a.lec-b.lec)||((a.r.sort||0)-(b.r.sort||0))||(a.r.id-b.r.id)});
@@ -628,7 +632,7 @@ function openLoad(){$("#loadModal").classList.add("on");setNav("load");
   var cur=$("#mjd").value;
   $("#mjd").innerHTML='<option value="">모든 진도</option>'+jds.map(function(p){return '<option value="'+esc(p.jd)+'">'+(p.open?'':'🔒 ')+esc(p.jd)+'</option>'}).join("");
   if(cur&&seen[cur])$("#mjd").value=cur;
-  renderLoad();setTimeout(function(){try{$("#mq").focus()}catch(e){}},50)}
+  renderLoad();renderFull();setTimeout(function(){try{$("#mq").focus()}catch(e){}},50)}
 function closeLoad(){$("#loadModal").classList.remove("on");setNav(view)}
 function stTag(id){var x=ST.p[id];if(!x||!x.tries.length)return '<span class="st">안 푼 문제</span>';var last=x.tries[x.tries.length-1].pct;
   if(x.box==="rw")return '<span class="st rw">🔁 재작성 · '+last+'%</span>';if(x.box==="dn")return '<span class="st dn">✅ 풀이함 · '+last+'%</span>';return '<span class="st tr">채점 '+last+'%</span>'}
@@ -942,6 +946,42 @@ $("#layBtn").onclick=function(){LAY=LAY==="auto"?"row":LAY==="row"?"col":"auto";
 window.addEventListener("resize",function(){clearTimeout(window.__lt);window.__lt=setTimeout(layApply,120)});
 window.addEventListener("orientationchange",function(){setTimeout(layApply,200)});
 layApply();
+/* ── 📘 전체문제수록집 받기: 지금 과목의 모든 문제(사례 · 물음 · 모범답안 · 핵심논리) · 응시권은 관리자가 정한 장수 ── */
+var FSET={},FTK=null,FBOOK=null;
+function hasApi(){try{return !!(PA.ccApi&&PA.ccApi.fullbook)}catch(e){return false}}
+function fcost(){var c=parseInt(FSET.fullbook_cost,10);return isNaN(c)?5:c}
+function renderFull(){
+  var el=$("#fullbar");if(!el)return;var n=PROBS.length;
+  if(!n){el.innerHTML="";el.style.display="none";return}el.style.display="";
+  var got=FBOOK&&FBOOK.subj===SUBJ;
+  el.innerHTML='<span class="meta">📘 <b>'+esc(SUBJ)+'</b> 전체문제수록집 — '+n+'문제 · 사례 · 물음 · 모범답안'+(hasApi()?(FTK!=null?' · 내 응시권 '+FTK+'장':''):' · 단독 실행이라 응시권 없이 받아요')+'</span>'+
+    (got?'<button class="btn" onclick="fullPrint()">🖨 인쇄</button><button class="btn" onclick="fullTxt()">💾 txt</button><button class="btn" onclick="fullCopy()">📋 복사</button>'
+       :'<button class="btn primary" onclick="fullBuy()">📘 전체문제수록집 받기'+(hasApi()?' · 응시권 '+fcost()+'장':'')+'</button>');
+}
+async function fullBuy(){
+  var L=PROBS.slice();if(!L.length)return;
+  if(hasApi()){var c=fcost();
+    if(FTK!=null&&FTK<c){if(confirm("응시권이 모자랍니다. 전체문제수록집 1회에 "+c+"장이 필요합니다 (지금 "+FTK+"장)."+(FSET.ticket_note?"\n\n"+FSET.ticket_note:"")+"\n\n🎫 응시권 충전 신청 화면을 열까요?")){try{PA.ccTkOpen()}catch(e){}}return}
+    if(!confirm(SUBJ+" 전체문제수록집 — "+L.length+"문제\n\n응시권 "+c+"장을 쓰고 받을까요?"+(FTK!=null?"\n(남은 응시권 "+FTK+"장 → "+(FTK-c)+"장)":"")))return;
+    try{FTK=await PA.ccApi.fullbook(SUBJ+" 2차 주관식 전체 · "+L.length+"문제")}catch(e){alert("전체문제수록집을 받지 못했습니다 — "+(e&&e.message||e));return}
+  }
+  FBOOK={subj:SUBJ,items:L};renderFull();toast("📘 전체문제수록집을 받았어요 — 인쇄 · txt · 복사");
+}
+function fullText(){if(!FBOOK)return "";var t="[시대에듀 법무사 · 케길반 2차 주관식 전체문제수록집 — "+FBOOK.subj+" · "+FBOOK.items.length+"문제]\n\n";
+  FBOOK.items.forEach(function(p,i){t+="■ "+(i+1)+". "+p.title+"  ["+p.jd+(p.chapter?" › "+p.chapter:"")+"]\n";
+    if(p.r.case_text)t+=p.r.case_text+"\n";if(p.r.question)t+=p.r.question+"\n";
+    t+="\n[모범답안]\n"+(p.r.model_answer||"")+"\n";if(p.r.logic)t+="\n[핵심논리]\n"+p.r.logic+"\n";t+="\n────────\n\n"});return t}
+function fullTxt(){var t=fullText();if(!t)return;try{var b=new Blob([t],{type:"text/plain;charset=utf-8"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="케길반_2차_전체문제수록집_"+FBOOK.subj+".txt";document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u)},100)}catch(e){toast("내려받기에 실패했어요")}}
+function fullCopy(){var t=fullText();if(!t)return;navigator.clipboard.writeText(t).then(function(){toast("복사했어요 — 메모장 등에 붙여넣기 하세요")},function(){toast("복사하지 못했어요 — txt로 내려받아 주세요")})}
+function fullPrint(){if(!FBOOK)return;
+  var h='<html><head><meta charset="utf-8"><title>케길반 2차 전체문제수록집</title><style>body{font-family:"Noto Sans KR",sans-serif;padding:28px;line-height:1.75}h2{border-bottom:2px solid #000;padding-bottom:8px}.box{border:1px solid #ccc;border-radius:8px;padding:16px 18px;margin-bottom:16px}.stg{font-size:12px;color:#888;font-weight:700}.tt{font-weight:800;font-size:16px;margin:2px 0 8px}.case{font-family:"Noto Serif KR",serif;white-space:pre-wrap}.q{margin:8px 0;font-weight:700;white-space:pre-wrap}.m{background:#f6f5f1;border-left:3px solid #1f4e8c;padding:10px 12px;white-space:pre-wrap;font-family:"Noto Serif KR",serif}.l{background:#fffacd;padding:8px 12px;margin-top:6px;white-space:pre-wrap}.lb{font-size:12px;font-weight:800;color:#1f4e8c;margin:10px 0 4px}@media print{.box{page-break-inside:avoid}}</style></head><body>';
+  h+='<h2>📘 시대에듀 법무사 · 케길반 2차 주관식 전체문제수록집</h2><p>'+esc(FBOOK.subj)+' · 총 '+FBOOK.items.length+'문제 · 진도 순</p>';
+  var last=null;FBOOK.items.forEach(function(p,i){
+    h+='<div class="box"><div class="stg">'+esc(p.jd)+(p.chapter?' › '+esc(p.chapter):'')+'</div><div class="tt">'+(i+1)+'. '+esc(p.title)+'</div>'+
+      (p.r.case_text?'<div class="case">'+esc(p.r.case_text)+'</div>':'')+(p.r.question?'<div class="q">'+esc(p.r.question)+'</div>':'')+
+      '<div class="lb">모범답안</div><div class="m">'+esc(p.r.model_answer||"")+'</div>'+(p.r.logic?'<div class="lb">핵심논리</div><div class="l">'+esc(p.r.logic)+'</div>':'')+'</div>'});
+  h+='</body></html>';var w=null;try{w=window.open("","_blank","width=860,height=700")}catch(e){}
+  if(!w){toast("새 창이 막혀 있어 txt로 내려받아요");fullTxt();return}w.document.write(h);w.document.close();w.focus();setTimeout(function(){w.print()},400)}
 /* ── 시작 ── */
 (function(){
   load();
@@ -953,6 +993,7 @@ layApply();
   var start=function(rows){
     ALL=(rows||[]).filter(function(r){return r.qtype==="주관식"});
     build();renderSubj();counts();renderDrawer();
+    if(hasApi()){try{PA.ccApi.settings().then(function(o){FSET=o||{};renderFull()},function(){});PA.ccApi.me().then(function(m){FTK=m?(m.tickets||0):null;renderFull()},function(){})}catch(e){}}
     if(jump&&jump.stage&&jump.lec){
       var inj=PROBS.filter(function(p){return p.stage===jump.stage&&p.lec===jump.lec&&p.open});
       if(inj.length===1){openProb(inj[0],1);return}
