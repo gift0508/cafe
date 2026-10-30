@@ -588,7 +588,7 @@ const mondayOf=s=>{const d=new Date(s+"T00:00:00");const off=(d.getDay()+6)%7;d.
 const DEF_SUBJ=["헌법","민법","상법","민사집행법","부동산등기법","상업등기법","공탁법","가족관계등록법"];
 const DEF_SLOTS=["08:30","09:30","10:30","11:30","13:30","14:30","15:30","16:30","18:30","19:30","20:30"];
 const DEF_SET={examDate:"",i1:2,i2:4,i3:8,dailyNew:30,sound:false,track:"법무사",name:"",subjects:DEF_SUBJ.slice(),slots:DEF_SLOTS.slice()};
-const SEED_VERSION=3;   /* 새 문제 재내장할 때마다 +1 올리면 모든 기기가 다음 접속 때 자동 수신 */
+const SEED_VERSION=4;   /* 새 문제 재내장할 때마다 +1 올리면 모든 기기가 다음 접속 때 자동 수신 */
 function readSeed(){try{var el=document.getElementById("seedData");if(el){var a=JSON.parse(el.textContent);if(a&&a.length)return a;}}catch(e){}return null;}
 function loadSeed(){var a=readSeed();var base={problems:a||[],weeks:{},settings:Object.assign({},DEF_SET),seedVersion:SEED_VERSION};return base;}
 function applySeed(d){               /* 기존 기기: 신규 추가 + 내용 갱신, 진도(단계·정오답)는 보존 */
